@@ -1,0 +1,6 @@
+# Dependencias de la POC de agentes.
+# Mínimas a propósito: cuanto menos "framework", mejor se entiende qué pasa por dentro.
+
+openai>=1.40.0      # cliente del modelo (sirve para OpenAI y cualquier endpoint compatible)
+requests>=2.31.0    # llamadas a la API REST de GitHub (comentar issue, poner labels)
+python-dotenv>=1.0.0  # cargar .env en modo local

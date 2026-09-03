@@ -1,0 +1,12 @@
+# Secretos y entorno local — JAMÁS subir al repo
+.env
+
+# Entornos virtuales de Python
+.venv/
+venv/
+
+# Cachés
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
