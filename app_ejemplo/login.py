@@ -41,9 +41,9 @@ def login():
     email = datos.get("email")        # <-- puede venir None o ""
     password = datos.get("password")
 
-    # BUG: no se valida 'email' antes de usarlo. Con email vacío/ausente,
-    # normalizar_email() lanza AttributeError y el usuario recibe un 500 feo
-    # en lugar de un mensaje claro "el email es obligatorio" (400).
+    if not isinstance(email, str) or not email.strip():
+        return jsonify({"ok": False, "mensaje": "El email es obligatorio"}), 400
+
     email = normalizar_email(email)
 
     if USUARIOS.get(email) == password:
