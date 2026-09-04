@@ -59,14 +59,9 @@ jobs:
           # 2) Prompt para Copilot. Le pedimos que SIGA el archivo del agente, así el
           #    comportamiento especializado que definimos en .github/agents/ también se
           #    aplica por la vía automática (Copilot lee el repo).
-          PROMPT="Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/${AGENTE}.md de este repositorio.
-
-Tarea proveniente del issue #${ISSUE_NUMBER}:
-Título: ${ISSUE_TITLE}
-
-${ISSUE_BODY}
-
-Cuando termines, abre un Pull Request con tu propuesta."
+          #    Se construye con printf (una sola línea de formato) para no romper el
+          #    bloque YAML con líneas sin indentar. Los datos del issue van como %s.
+          PROMPT=$(printf 'Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/%s.md de este repositorio.\n\nTarea proveniente del issue #%s:\nTitulo: %s\n\n%s\n\nCuando termines, abre un Pull Request con tu propuesta.' "$AGENTE" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY")
 
           # 3) Crear la tarea del agente (abre PR). API en preview:
           #    POST /agents/repos/{owner}/{repo}/tasks
