@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de propina · POC agentes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="tarjeta">
+    <header class="cabecera">
+      <h1>💸 Calculadora de propina</h1>
+      <p>App de demo estática para la POC de agentes de GitHub</p>
+    </header>
+
+    <form id="formulario" class="formulario" novalidate>
+      <label>
+        Importe de la cuenta (€)
+        <input id="cuenta" type="number" min="0" step="0.01" placeholder="50.00" />
+      </label>
+
+      <label>
+        Propina (%)
+        <input id="porcentaje" type="number" min="0" step="1" value="10" />
+      </label>
+
+      <label>
+        Número de personas
+        <input id="personas" type="number" min="1" step="1" value="2" />
+      </label>
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    <section id="resultado" class="resultado oculto" aria-live="polite">
+      <div class="fila"><span>Propina</span><strong id="r-propina">—</strong></div>
+      <div class="fila"><span>Total</span><strong id="r-total">—</strong></div>
+      <div class="fila destacada"><span>Por persona</span><strong id="r-persona">—</strong></div>
+    </section>
+
+    <p id="error" class="error oculto" role="alert"></p>
+
+    <footer class="pie">
+      <span>Desplegada con GitHub Pages · <a href="https://github.com/vmfernandezg/poc-agentes-github">repo</a></span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

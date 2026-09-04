@@ -1,0 +1,47 @@
+# Despliega la carpeta web/ en GitHub Pages en cada push a main.
+# Este es el lado "deterministic" de la demo: no hay IA aquí, solo publicación.
+# La gracia luego: un agente arregla web/app.js -> PR -> merge -> este workflow
+# redespliega -> ves el arreglo en vivo en la URL de Pages.
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+# Permisos que exige el despliegue oficial de Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita despliegues solapados.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir la carpeta web/ como artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Desplegar en Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
