@@ -42,7 +42,8 @@ function calcular(evento) {
   const propina = cuenta * (porcentaje / 100);
   const total = cuenta + propina;
 
-  const porPersona = total / personas;
+  // BUG INTENCIONADO: se ignora "personas". Debería ser: total / personas
+  const porPersona = total;
 
   $("error").classList.add("oculto");
   $("r-propina").textContent = formatearEuros(propina);
