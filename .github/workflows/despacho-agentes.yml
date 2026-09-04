@@ -1,0 +1,89 @@
+# Workflow de DESPACHO: al etiquetar un issue, dispara al agente nativo de Copilot que
+# corresponda. Este es el corazón de la v2 nativa: "etiqueta un issue -> se arregla solo".
+#
+# Mapa de etiquetas -> agente (.github/agents/*.md):
+#   auto-fix      -> corrige-bugs
+#   auto-feature  -> implementa-feature
+#   auto-tests    -> escribe-tests
+#   auto-docs     -> documenta
+#   auto-review   -> revisa-codigo
+#
+# ⚠️ IMPORTANTE: la API de tareas del agente EXIGE un token de USUARIO (un PAT), no el
+# GITHUB_TOKEN normal del workflow (que es server-to-server y NO sirve). Por eso se usa
+# el secret COPILOT_AGENT_PAT. Cómo crearlo: ver V2-NATIVA.md.
+
+name: Despacho de agentes IA
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  despachar:
+    # Solo corre cuando la etiqueta añadida empieza por "auto-".
+    if: startsWith(github.event.label.name, 'auto-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar al agente de Copilot según la etiqueta
+        env:
+          # Token de USUARIO (PAT). El GITHUB_TOKEN normal no vale para esta API.
+          GH_TOKEN: ${{ secrets.COPILOT_AGENT_PAT }}
+          REPO: ${{ github.repository }}
+          LABEL: ${{ github.event.label.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::Falta el secret COPILOT_AGENT_PAT (un PAT de usuario). Ver V2-NATIVA.md."
+            exit 1
+          fi
+
+          # 1) Etiqueta -> agente
+          case "$LABEL" in
+            auto-fix)     AGENTE="corrige-bugs" ;;
+            auto-feature) AGENTE="implementa-feature" ;;
+            auto-tests)   AGENTE="escribe-tests" ;;
+            auto-docs)    AGENTE="documenta" ;;
+            auto-review)  AGENTE="revisa-codigo" ;;
+            *) echo "Etiqueta '$LABEL' sin agente asociado. Nada que hacer."; exit 0 ;;
+          esac
+          echo "Etiqueta '$LABEL'  ->  agente '$AGENTE'"
+
+          # 2) Prompt para Copilot. Le pedimos que SIGA el archivo del agente, así el
+          #    comportamiento especializado que definimos en .github/agents/ también se
+          #    aplica por la vía automática (Copilot lee el repo).
+          PROMPT="Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/${AGENTE}.md de este repositorio.
+
+Tarea proveniente del issue #${ISSUE_NUMBER}:
+Título: ${ISSUE_TITLE}
+
+${ISSUE_BODY}
+
+Cuando termines, abre un Pull Request con tu propuesta."
+
+          # 3) Crear la tarea del agente (abre PR). API en preview:
+          #    POST /agents/repos/{owner}/{repo}/tasks
+          BODY=$(jq -n --arg p "$PROMPT" '{prompt:$p, base_ref:"main", create_pull_request:true}')
+
+          if RESP=$(printf '%s' "$BODY" | gh api --method POST \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "/agents/repos/${REPO}/tasks" --input - 2>&1); then
+            echo "Tarea creada correctamente:"
+            echo "$RESP"
+            gh api --method POST "/repos/${REPO}/issues/${ISSUE_NUMBER}/comments" \
+              -f body="🤖 He despachado al agente **${AGENTE}** para trabajar en este issue. En unos minutos debería aparecer un Pull Request con la propuesta."
+          else
+            echo "::error::Fallo al crear la tarea del agente."
+            echo "$RESP"
+            gh api --method POST "/repos/${REPO}/issues/${ISSUE_NUMBER}/comments" \
+              -f body="⚠️ No pude despachar al agente **${AGENTE}**. Revisa los logs del workflow y el secret COPILOT_AGENT_PAT (permisos del PAT)." || true
+            exit 1
+          fi
