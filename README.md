@@ -28,6 +28,12 @@ proveedor compatible con OpenAI (aquí, **OpenAI**), pero el código está escri
 > Un "sistema multi-agente" es simplemente **varios de esos** especializados y
 > **orquestados** (encadenados, y con unos revisando el trabajo de otros).
 
+## Guías rápidas del repo
+
+- **Arquitectura:** [`ARQUITECTURA.md`](ARQUITECTURA.md)
+- **Cómo contribuir:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- **Diagrama visual:** [`DIAGRAMA.md`](DIAGRAMA.md)
+
 ---
 
 ## 1. Qué hace la POC
@@ -83,6 +89,32 @@ Los *system prompts* de cada uno están en [`agentes/roles.py`](agentes/roles.py
   <https://platform.openai.com/api-keys>. Uso de pago por consumo; esta POC con
   `gpt-4o-mini` cuesta **céntimos** por ejecución.
 - Para probar en local: **Python 3.10+** instalado.
+
+### 3.1 Levantar el proyecto en local (rápido)
+
+> Si quieres una guía más completa para aportar cambios, ve a `CONTRIBUTING.md`.
+
+**Linux/macOS (bash):**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# edita .env y rellena OPENAI_API_KEY
+python run_local.py
+```
+
+**Windows (PowerShell):**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env
+# edita .env y rellena OPENAI_API_KEY
+python run_local.py
+```
 
 ---
 
