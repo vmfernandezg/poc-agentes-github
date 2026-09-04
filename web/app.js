@@ -1,9 +1,6 @@
 // Lógica de la calculadora de propina.
 //
-// ⚠️ Contiene un BUG a propósito para la demo de agentes:
-//    el "Total por persona" NO divide entre el número de personas.
-//    Cuando un agente lo arregle (PR -> merge -> GitHub Pages redespliega),
-//    verás el resultado corregido EN VIVO en la web.
+// El total por persona divide correctamente entre el número de personas.
 
 const $ = (id) => document.getElementById(id);
 
