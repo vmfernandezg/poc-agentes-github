@@ -67,6 +67,11 @@ body {
   background: var(--azul);
   border-color: var(--azul);
 }
+.boton-propina:focus-visible,
+.boton-calcular:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+}
 
 .boton-calcular {
   margin-top: .25rem;
