@@ -56,29 +56,58 @@ jobs:
           esac
           echo "Etiqueta '$LABEL'  ->  agente '$AGENTE'"
 
-          # 2) Prompt para Copilot. Le pedimos que SIGA el archivo del agente, así el
-          #    comportamiento especializado que definimos en .github/agents/ también se
-          #    aplica por la vía automática (Copilot lee el repo).
-          #    Se construye con printf (una sola línea de formato) para no romper el
-          #    bloque YAML con líneas sin indentar. Los datos del issue van como %s.
-          PROMPT=$(printf 'Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/%s.md de este repositorio.\n\nTarea proveniente del issue #%s:\nTitulo: %s\n\n%s\n\nCuando termines, abre un Pull Request con tu propuesta. IMPORTANTE: en la descripcion del Pull Request incluye la linea "Closes #%s" para que el issue se cierre automaticamente al mergear.' "$AGENTE" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY" "$ISSUE_NUMBER")
+          # 2) Prompt para Copilot: seguir el archivo del agente. El auto-cierre del issue
+          #    NO se le pide al agente (poco fiable): lo hace este workflow mas abajo (paso 4).
+          PROMPT=$(printf 'Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/%s.md de este repositorio.\n\nTarea proveniente del issue #%s:\nTitulo: %s\n\n%s\n\nCuando termines, abre un Pull Request con tu propuesta.' "$AGENTE" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY")
 
-          # 3) Crear la tarea del agente (abre PR). API en preview:
-          #    POST /agents/repos/{owner}/{repo}/tasks
+          # 3) Crear la tarea del agente (API en preview): POST /agents/repos/{owner}/{repo}/tasks
           BODY=$(jq -n --arg p "$PROMPT" '{prompt:$p, base_ref:"main", create_pull_request:true}')
 
-          if RESP=$(printf '%s' "$BODY" | gh api --method POST \
+          if ! RESP=$(printf '%s' "$BODY" | gh api --method POST \
                 -H "Accept: application/vnd.github+json" \
                 -H "X-GitHub-Api-Version: 2022-11-28" \
                 "/agents/repos/${REPO}/tasks" --input - 2>&1); then
-            echo "Tarea creada correctamente:"
-            echo "$RESP"
-            gh api --method POST "/repos/${REPO}/issues/${ISSUE_NUMBER}/comments" \
-              -f body="🤖 He despachado al agente **${AGENTE}** para trabajar en este issue. En unos minutos debería aparecer un Pull Request con la propuesta."
-          else
             echo "::error::Fallo al crear la tarea del agente."
             echo "$RESP"
             gh api --method POST "/repos/${REPO}/issues/${ISSUE_NUMBER}/comments" \
-              -f body="⚠️ No pude despachar al agente **${AGENTE}**. Revisa los logs del workflow y el secret COPILOT_AGENT_PAT (permisos del PAT)." || true
+              -f body="⚠️ No pude despachar al agente **${AGENTE}**. Revisa los logs y el secret COPILOT_AGENT_PAT." || true
             exit 1
           fi
+          echo "Tarea creada:"; echo "$RESP"
+          TASK_ID=$(printf '%s' "$RESP" | jq -r '.id')
+          gh api --method POST "/repos/${REPO}/issues/${ISSUE_NUMBER}/comments" \
+            -f body="🤖 Despachado el agente **${AGENTE}**. En unos minutos aparecerá un Pull Request (lo enlazaré a este issue para que se cierre al mergear)."
+
+          # 4) AUTO-CIERRE DETERMINISTA: esperar a que la tarea tenga rama, localizar su PR
+          #    y anadirle nosotros "Closes #N" (no dependemos de que el agente lo escriba).
+          OWNER="${REPO%%/*}"
+          HEAD_REF=""
+          for i in $(seq 1 18); do
+            sleep 20
+            HEAD_REF=$(gh api "/agents/repos/${REPO}/tasks/${TASK_ID}" \
+                --jq '.artifacts[]? | select(.type=="branch") | .data.head_ref' 2>/dev/null | head -n1 || true)
+            if [ -n "$HEAD_REF" ]; then break; fi
+          done
+
+          if [ -z "$HEAD_REF" ]; then
+            echo "::warning::No se detecto la rama del agente a tiempo; habra que cerrar el issue a mano."
+            exit 0
+          fi
+          echo "Rama del agente: $HEAD_REF"
+
+          PR_NUM=""
+          for i in $(seq 1 8); do
+            PR_NUM=$(gh api "/repos/${REPO}/pulls?head=${OWNER}:${HEAD_REF}&state=open" --jq '.[0].number // empty' 2>/dev/null || true)
+            if [ -n "$PR_NUM" ]; then break; fi
+            sleep 15
+          done
+
+          if [ -z "$PR_NUM" ]; then
+            echo "::warning::No encontre el PR de la rama ${HEAD_REF}; habra que cerrar el issue a mano."
+            exit 0
+          fi
+
+          CUR_BODY=$(gh api "/repos/${REPO}/pulls/${PR_NUM}" --jq '.body // ""')
+          NEW_BODY=$(printf '%s\n\nCloses #%s' "$CUR_BODY" "$ISSUE_NUMBER")
+          gh api --method PATCH "/repos/${REPO}/pulls/${PR_NUM}" -f body="$NEW_BODY" >/dev/null
+          echo "PR #${PR_NUM} enlazado con 'Closes #${ISSUE_NUMBER}'. Al mergearlo, el issue se cerrara solo."
