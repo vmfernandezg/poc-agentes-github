@@ -61,7 +61,7 @@ jobs:
           #    aplica por la vía automática (Copilot lee el repo).
           #    Se construye con printf (una sola línea de formato) para no romper el
           #    bloque YAML con líneas sin indentar. Los datos del issue van como %s.
-          PROMPT=$(printf 'Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/%s.md de este repositorio.\n\nTarea proveniente del issue #%s:\nTitulo: %s\n\n%s\n\nCuando termines, abre un Pull Request con tu propuesta.' "$AGENTE" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY")
+          PROMPT=$(printf 'Sigue estrictamente las instrucciones del agente definido en el archivo .github/agents/%s.md de este repositorio.\n\nTarea proveniente del issue #%s:\nTitulo: %s\n\n%s\n\nCuando termines, abre un Pull Request con tu propuesta. IMPORTANTE: en la descripcion del Pull Request incluye la linea "Closes #%s" para que el issue se cierre automaticamente al mergear.' "$AGENTE" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_BODY" "$ISSUE_NUMBER")
 
           # 3) Crear la tarea del agente (abre PR). API en preview:
           #    POST /agents/repos/{owner}/{repo}/tasks
