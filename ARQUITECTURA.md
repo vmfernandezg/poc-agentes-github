@@ -23,19 +23,24 @@ Disparador: `issues: labeled` cuando la etiqueta empieza por `auto-`.
 
 ```mermaid
 flowchart LR
-    I([Issue etiquetado auto-*]) --> D{"despacho-agentes.yml<br/>etiqueta → agente"}
-    D -->|auto-fix| A1[corrige-bugs]
-    D -->|auto-feature| A2[implementa-feature]
-    D -->|auto-tests| A3[escribe-tests]
-    D -->|auto-docs| A4[documenta]
-    D -->|auto-review| A5[revisa-codigo]
+    I([Issue etiquetado auto-*]):::humano --> D{"despacho-agentes.yml<br/>etiqueta → agente"}:::yaml
+    D -->|auto-fix| A1[corrige-bugs]:::ia
+    D -->|auto-feature| A2[implementa-feature]:::ia
+    D -->|auto-tests| A3[escribe-tests]:::ia
+    D -->|auto-docs| A4[documenta]:::ia
+    D -->|auto-review| A5[revisa-codigo]:::ia
     A1 --> PR[Pull Request]
     A2 --> PR
     A3 --> PR
     A4 --> PR
     A5 --> PR
-    PR --> M([Revisión humana + merge]) --> DP["deploy-pages.yml<br/>(si toca web/)"]
+    PR --> M([Revisión humana + merge]):::humano --> DP["deploy-pages.yml<br/>(si toca web/)"]:::yaml
+    classDef humano fill:#1f6feb,stroke:#0b3d91,color:#ffffff
+    classDef yaml fill:#1a7f37,stroke:#0b5323,color:#ffffff
+    classDef ia fill:#8250df,stroke:#4c2889,color:#ffffff
 ```
+
+**Leyenda:** 🔵 acción humana · 🟢 workflow YAML (sin IA) · 🟣 agente de IA
 
 Secuencia:
 1. El workflow traduce **etiqueta → agente** con un `case` de bash (determinista, sin IA):

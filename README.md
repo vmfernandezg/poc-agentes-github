@@ -31,10 +31,12 @@ flowchart TD
     AG["Agente de Copilot (IA)<br/>lee el repo, crea rama y abre un PR"]:::ia --> H
     H([Revisas y mergeas el PR]):::humano --> W2
     W2["deploy-pages.yml<br/>republica web/ en GitHub Pages"]:::yaml --> LIVE([Web actualizada en vivo])
-    classDef humano fill:#eef2ff,stroke:#6673cc
-    classDef yaml fill:#e9f9ee,stroke:#4caf6a
-    classDef ia fill:#fdeefb,stroke:#b45fb0
+    classDef humano fill:#1f6feb,stroke:#0b3d91,color:#ffffff
+    classDef yaml fill:#1a7f37,stroke:#0b5323,color:#ffffff
+    classDef ia fill:#8250df,stroke:#4c2889,color:#ffffff
 ```
+
+**Leyenda:** 🔵 acción humana · 🟢 workflow YAML (sin IA) · 🟣 agente de IA
 
 En texto:
 1. **[TÚ]** Abres un issue y le pones una etiqueta `auto-*` (el disparador es la **etiqueta**).
