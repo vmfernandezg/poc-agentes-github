@@ -96,6 +96,14 @@ fine-grained NO funcionan, y el `GITHUB_TOKEN` normal tampoco).
 
 Detalles en [`V2-NATIVA.md`](V2-NATIVA.md). Despliegue en [`DEMO-PAGES.md`](DEMO-PAGES.md).
 
+### 5.3. Ejecutar tests de la calculadora
+
+```bash
+npm test
+```
+
+Esto ejecuta los tests de `web/app.js` con el runner nativo de Node (`node --test`).
+
 ---
 
 ## 6. Aprendizajes clave
