@@ -1,0 +1,7 @@
+{
+  "name": "poc-agentes-github",
+  "private": true,
+  "scripts": {
+    "test": "node --test web/app.test.js"
+  }
+}
