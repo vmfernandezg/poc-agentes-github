@@ -48,7 +48,7 @@ function calcularResumen(cuenta, porcentaje, personas) {
 //  2) DIVISAS
 // ----------------------------------------------------------------------------
 // Tasas de ejemplo: unidades de cada moneda por 1 EUR.
-const TASAS = { EUR: 1, USD: 1.08, GBP: 0.85, JPY: 160, CHF: 0.95 };
+const TASAS = { EUR: 1, USD: 1.08, GBP: 0.85, JPY: 160, CHF: 0.95, MXN: 18.5 };
 
 function convertirDivisa(importe, origen, destino, tasas = TASAS) {
   if (!Number.isFinite(importe) || importe < 0) {

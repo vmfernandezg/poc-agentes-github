@@ -45,6 +45,13 @@ test("divisas: convierte EUR a USD con la tasa de ejemplo", () => {
   cerca(r.tasa, 1.08);
 });
 
+test("divisas: convierte EUR a MXN con la tasa de ejemplo", () => {
+  const r = convertirDivisa(100, "EUR", "MXN");
+  assert.equal(r.error, undefined);
+  cerca(r.resultado, 1850);
+  cerca(r.tasa, 18.5);
+});
+
 test("divisas: misma moneda devuelve el mismo importe", () => {
   const r = convertirDivisa(100, "EUR", "EUR");
   cerca(r.resultado, 100);
