@@ -5,6 +5,16 @@
 > issue → un workflow despacha al agente adecuado → el agente corrige/documenta el código
 > y **abre un Pull Request** → tú revisas y mergeas.
 
+## Índice
+
+- [1. Qué es esto (y qué NO)](#1-qué-es-esto-y-qué-no)
+- [2. Cómo funciona (flujo completo)](#2-cómo-funciona-flujo-completo)
+- [3. Los agentes (`.github/agents/`)](#3-los-agentes-githubagents)
+- [4. Estructura del repo](#4-estructura-del-repo)
+- [5. Puesta en marcha](#5-puesta-en-marcha)
+- [6. Aprendizajes clave](#6-aprendizajes-clave)
+- [FAQ](#faq)
+
 🌐 **Demo desplegada:** https://vmfernandezg.github.io/poc-agentes-github/
 
 ---
