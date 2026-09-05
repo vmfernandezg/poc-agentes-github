@@ -82,18 +82,24 @@ jobs:
           #    y anadirle nosotros "Closes #N" (no dependemos de que el agente lo escriba).
           OWNER="${REPO%%/*}"
           HEAD_REF=""
-          for i in $(seq 1 18); do
+          STATE=""
+          # Esperamos a que la tarea esté COMPLETED antes de tocar el PR. Si parcheamos
+          # mientras el agente sigue trabajando, este reescribe la descripcion del PR y
+          # borra nuestro "Closes #N" (condicion de carrera detectada en pruebas).
+          for i in $(seq 1 30); do
             sleep 20
-            HEAD_REF=$(gh api "/agents/repos/${REPO}/tasks/${TASK_ID}" \
-                --jq '.artifacts[]? | select(.type=="branch") | .data.head_ref' 2>/dev/null | head -n1 || true)
-            if [ -n "$HEAD_REF" ]; then break; fi
+            TASK_JSON=$(gh api "/agents/repos/${REPO}/tasks/${TASK_ID}" 2>/dev/null || true)
+            STATE=$(printf '%s' "$TASK_JSON" | jq -r '.state // empty')
+            HEAD_REF=$(printf '%s' "$TASK_JSON" | jq -r '.artifacts[]? | select(.type=="branch") | .data.head_ref' 2>/dev/null | head -n1 || true)
+            echo "tarea: estado=${STATE:-?}  rama=${HEAD_REF:-?}"
+            if [ "$STATE" = "completed" ] && [ -n "$HEAD_REF" ]; then break; fi
           done
 
-          if [ -z "$HEAD_REF" ]; then
-            echo "::warning::No se detecto la rama del agente a tiempo; habra que cerrar el issue a mano."
+          if [ "$STATE" != "completed" ] || [ -z "$HEAD_REF" ]; then
+            echo "::warning::La tarea no completó a tiempo; habra que cerrar el issue a mano."
             exit 0
           fi
-          echo "Rama del agente: $HEAD_REF"
+          echo "Rama del agente: $HEAD_REF (tarea completed)"
 
           PR_NUM=""
           for i in $(seq 1 8); do
