@@ -26,7 +26,7 @@ lo esperado:
 | 💸 Propina | cuenta 50, propina 10%, personas 2 | Propina 5,00 € · Total 55,00 € · Por persona 27,50 € |
 | 💸 Propina | pulsar botón "20%" | el campo % pasa a 20 y el botón queda resaltado |
 | 💱 Divisas | 100, de EUR a USD | ≈ 108,00 $ (tasa 1 EUR = 1,08 USD) |
-| 🏦 Préstamo | importe 1200, interés 0%, plazo 12 | Cuota 100,00 € · Total 1.200,00 € · Intereses 0,00 € |
+| 🏦 Préstamo | importe 1200, interés 0%, plazo 12 | Cuota 100,00 € · Total 1200,00 € · Intereses 0,00 € |
 | 🧾 Gastos | total 120, personas 3, propina 0% | Total 120,00 € · Por persona 40,00 € |
 | 📈 Ahorro | meta 1000, aporte 100, interés 0% | 10 meses |
 
