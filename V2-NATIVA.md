@@ -13,6 +13,7 @@ y este **abre un Pull Request** con la propuesta. Tú revisas y haces merge.
 | `escribe-tests` | Añade tests (casos normales y límite) | `auto-tests` |
 | `documenta` | Mejora documentación (sin tocar lógica) | `auto-docs` |
 | `revisa-codigo` | Revisa y reporta problemas por severidad | `auto-review` |
+| `verifica-ui` | Prueba la web en un navegador con Playwright → informe + capturas | `auto-qa` |
 
 Cada agente es un archivo Markdown con `name`/`description` + instrucciones. Editarlos
 cambia su comportamiento; añadir uno nuevo es copiar el patrón y mapear una etiqueta en el

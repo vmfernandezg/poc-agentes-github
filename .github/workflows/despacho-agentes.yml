@@ -7,6 +7,7 @@
 #   auto-tests    -> escribe-tests
 #   auto-docs     -> documenta
 #   auto-review   -> revisa-codigo
+#   auto-qa       -> verifica-ui
 #
 # ⚠️ IMPORTANTE: la API de tareas del agente EXIGE un token de USUARIO (un PAT), no el
 # GITHUB_TOKEN normal del workflow (que es server-to-server y NO sirve). Por eso se usa
@@ -52,6 +53,7 @@ jobs:
             auto-tests)   AGENTE="escribe-tests" ;;
             auto-docs)    AGENTE="documenta" ;;
             auto-review)  AGENTE="revisa-codigo" ;;
+            auto-qa)      AGENTE="verifica-ui" ;;
             *) echo "Etiqueta '$LABEL' sin agente asociado. Nada que hacer."; exit 0 ;;
           esac
           echo "Etiqueta '$LABEL'  ->  agente '$AGENTE'"

@@ -66,6 +66,7 @@ En texto:
 | `escribe-tests` | Añade tests (casos normales y límite) | `auto-tests` |
 | `documenta` | Mejora documentación (sin tocar lógica) | `auto-docs` |
 | `revisa-codigo` | Revisa y reporta problemas por severidad | `auto-review` |
+| `verifica-ui` | Prueba la web en un navegador (Playwright) → informe + capturas | `auto-qa` |
 
 Editar el `.md` de un agente cambia su comportamiento. Añadir uno nuevo = copiar el patrón
 y mapear una etiqueta en `despacho-agentes.yml`.

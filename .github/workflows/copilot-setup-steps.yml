@@ -1,0 +1,31 @@
+# Prepara el ENTORNO efímero del Copilot Coding Agent antes de cada tarea.
+# GitHub busca un job llamado exactamente "copilot-setup-steps" en este archivo.
+# Aquí dejamos Node listo para que el agente pueda ejecutar `npm test` mientras trabaja.
+#
+# La app no tiene dependencias externas (usa el runner nativo `node --test`), así que
+# el setup es mínimo: Node + preparar npm.
+
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Preparar dependencias (no hay externas)
+        run: npm install --no-audit --no-fund
