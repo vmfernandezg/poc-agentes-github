@@ -21,6 +21,22 @@ la web demo. La IA vive solo en los agentes; los workflows son deterministas.
 
 Disparador: `issues: labeled` cuando la etiqueta empieza por `auto-`.
 
+```mermaid
+flowchart LR
+    I([Issue etiquetado auto-*]) --> D{"despacho-agentes.yml<br/>etiqueta → agente"}
+    D -->|auto-fix| A1[corrige-bugs]
+    D -->|auto-feature| A2[implementa-feature]
+    D -->|auto-tests| A3[escribe-tests]
+    D -->|auto-docs| A4[documenta]
+    D -->|auto-review| A5[revisa-codigo]
+    A1 --> PR[Pull Request]
+    A2 --> PR
+    A3 --> PR
+    A4 --> PR
+    A5 --> PR
+    PR --> M([Revisión humana + merge]) --> DP["deploy-pages.yml<br/>(si toca web/)"]
+```
+
 Secuencia:
 1. El workflow traduce **etiqueta → agente** con un `case` de bash (determinista, sin IA):
    - `auto-fix` → `corrige-bugs`

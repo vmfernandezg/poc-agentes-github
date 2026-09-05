@@ -24,15 +24,24 @@ lo ejecuta en la nube y abre un PR.
 
 ## 2. Cómo funciona (flujo completo)
 
+```mermaid
+flowchart TD
+    U([Etiquetas un issue con auto-*]):::humano --> W1
+    W1["despacho-agentes.yml<br/>mapea etiqueta → agente (sin IA)<br/>y lanza al agente vía API"]:::yaml --> AG
+    AG["Agente de Copilot (IA)<br/>lee el repo, crea rama y abre un PR"]:::ia --> H
+    H([Revisas y mergeas el PR]):::humano --> W2
+    W2["deploy-pages.yml<br/>republica web/ en GitHub Pages"]:::yaml --> LIVE([Web actualizada en vivo])
+    classDef humano fill:#eef2ff,stroke:#6673cc
+    classDef yaml fill:#e9f9ee,stroke:#4caf6a
+    classDef ia fill:#fdeefb,stroke:#b45fb0
 ```
-1. [TÚ]   Abres un issue y le pones una etiqueta auto-*        ← el disparador es la ETIQUETA
-2. [YAML] despacho-agentes.yml mapea la etiqueta → un agente   ← determinista, sin IA
-          y llama a la API de Copilot para lanzarlo
-3. [IA]   El agente de Copilot lee el repo, crea una rama,
-          hace el cambio y ABRE un Pull Request
-4. [TÚ]   Revisas y mergeas el PR
-5. [YAML] deploy-pages.yml republica la web en GitHub Pages    (solo si tocaste web/)
-```
+
+En texto:
+1. **[TÚ]** Abres un issue y le pones una etiqueta `auto-*` (el disparador es la **etiqueta**).
+2. **[YAML]** `despacho-agentes.yml` mapea la etiqueta → un agente (determinista, **sin IA**) y lo lanza.
+3. **[IA]** El agente de Copilot lee el repo, crea una rama y **abre un Pull Request**.
+4. **[TÚ]** Revisas y mergeas el PR.
+5. **[YAML]** `deploy-pages.yml` republica la web en GitHub Pages (solo si tocaste `web/`).
 
 ---
 
