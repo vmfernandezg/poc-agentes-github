@@ -1,9 +1,6 @@
 // Lógica de la calculadora de propina.
 //
-// ⚠️ Contiene un BUG a propósito para la demo de agentes:
-//    el "Total por persona" NO divide entre el número de personas.
-//    Cuando un agente lo arregle (PR -> merge -> GitHub Pages redespliega),
-//    verás el resultado corregido EN VIVO en la web.
+// Cálculo y validación de la calculadora de propina.
 
 const $ = (id) => document.getElementById(id);
 
@@ -30,28 +27,31 @@ function actualizarBotonActivo(valor) {
 function calcular(evento) {
   evento.preventDefault();
 
-  const cuenta = parseFloat($("cuenta").value);
-  const porcentaje = parseFloat($("porcentaje").value);
-  const personas = parseInt($("personas").value, 10);
+  const cuenta = Number($("cuenta").value);
+  const porcentaje = Number($("porcentaje").value);
+  const personas = Number($("personas").value);
 
   // Validación básica de entradas.
-  if (isNaN(cuenta) || cuenta <= 0) {
+  if (!Number.isFinite(cuenta) || cuenta <= 0) {
     mostrarError("Introduce un importe de cuenta válido.");
     return;
   }
-  if (isNaN(porcentaje) || porcentaje < 0) {
+  if (!Number.isFinite(porcentaje) || porcentaje < 0) {
     mostrarError("Introduce un porcentaje de propina válido.");
     return;
   }
-  if (isNaN(personas) || personas < 1) {
-    mostrarError("Debe haber al menos 1 persona.");
+  if (!Number.isFinite(personas) || !Number.isInteger(personas) || personas < 1) {
+    mostrarError("El número de personas debe ser un entero de al menos 1.");
     return;
   }
 
   const propina = cuenta * (porcentaje / 100);
   const total = cuenta + propina;
-
   const porPersona = total / personas;
+  if (!Number.isFinite(propina) || !Number.isFinite(total) || !Number.isFinite(porPersona)) {
+    mostrarError("Los valores son demasiado grandes para calcularse con precisión.");
+    return;
+  }
 
   $("error").classList.add("oculto");
   $("r-propina").textContent = formatearEuros(propina);
