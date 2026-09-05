@@ -1,92 +1,66 @@
 # 🤝 Guía de contribución
 
-Gracias por contribuir a esta POC. La idea es mantener cambios **pequeños, claros y verificables**.
+Este repo es una POC de **agentes nativos de GitHub Copilot**. No hay que instalar nada en
+local: se trabaja sobre archivos de configuración (`.github/agents/` y workflows) y la web
+estática de `web/`.
 
 ---
 
-## 1) Preparar entorno local
+## 1) Añadir o modificar un agente
 
-### Linux/macOS (bash)
+Los agentes son archivos Markdown en `.github/agents/NOMBRE.md`:
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-# completa OPENAI_API_KEY en .env
+```markdown
+---
+name: mi-agente
+description: Qué hace, en una frase.
+---
+
+Eres un agente que... (instrucciones: cómo se comporta, qué produce, qué NO debe tocar).
 ```
 
-### Windows (PowerShell)
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
-# completa OPENAI_API_KEY en .env
-```
+- **Modificar** un agente = editar su `.md`. El cambio aplica en el siguiente despacho.
+- **Añadir** un agente nuevo:
+  1. Crea `.github/agents/mi-agente.md`.
+  2. Añade una etiqueta y su mapeo en `.github/workflows/despacho-agentes.yml`
+     (el bloque `case "$LABEL" in ...`).
+  3. Crea la etiqueta en el repo: `gh label create auto-mi-agente`.
 
 ---
 
-## 2) Ejecutar la POC
+## 2) Probar el flujo de agentes
 
-### Pipeline local (sin publicar en GitHub)
-
-```bash
-python run_local.py
-python run_local.py --titulo "..." --cuerpo "..."
-```
-
-Opcional: analizar otro repo local.
-
-```bash
-python run_local.py --repo /ruta/a/otro/repo
-```
-
-### Prueba del flujo en GitHub Actions (pipeline de 6 agentes)
-
-1. Asegura el secret `OPENAI_API_KEY` en el repo.
-2. Abre un issue (o comenta `/agentes` en uno existente).
-3. Revisa la ejecución en **Actions** y el comentario final en el issue.
-
-### Prueba del flujo nativo por etiquetas (v2)
-
-1. Configura el secret `COPILOT_AGENT_PAT`.
-2. Etiqueta un issue con `auto-fix`, `auto-feature`, `auto-tests`, `auto-docs` o `auto-review`.
-3. Revisa el workflow **Despacho de agentes IA** y el PR creado por el agente.
+1. Asegura el secret `COPILOT_AGENT_PAT` (PAT **classic** con scope `repo`).
+2. Abre un issue describiendo la tarea.
+3. Ponle la etiqueta `auto-*` correspondiente.
+4. Revisa el workflow **Despacho de agentes IA** en *Actions* y el **PR** que abre el agente.
+5. Revisa el PR y mergéalo si te convence (el agente propone; tú decides).
 
 ---
 
-## 3) Ejecutar tests
+## 3) La web demo (`web/`)
 
-El repo incluye pruebas con `unittest`:
-
-```bash
-python -m unittest discover -s tests -p "test_*.py"
-```
-
-> Nota: `tests/test_login.py` usa Flask (`app_ejemplo/login.py`). Si no lo tienes instalado, instala `flask` en tu entorno local antes de ejecutar ese test.
+Es una app estática. Para verla en local, abre `web/index.html` en el navegador. Al
+mergear cambios en `web/` a `main`, `deploy-pages.yml` la republica en GitHub Pages.
 
 ---
 
-## 4) Flujo recomendado para contribuir
+## 4) Flujo recomendado
 
-1. Crea una rama desde `main`.
-2. Haz un cambio acotado (una mejora concreta por PR).
-3. Verifica localmente lo que aplique (`run_local.py` y/o tests).
-4. Abre PR explicando:
-   - Qué cambiaste.
-   - Por qué ese cambio mejora la POC.
-   - Cómo lo validaste.
+1. Los cambios de código los propone un **agente** vía PR (etiquetando un issue), o los
+   haces tú en una rama.
+2. Un cambio acotado por PR.
+3. PR con: qué cambiaste, por qué y cómo validarlo.
+4. Revisión humana antes de merge. Nunca commits directos a `main` para cambios de código.
 
 ---
 
 ## 5) Dónde tocar según el tipo de mejora
 
-- **Comportamiento de los agentes (pipeline v1):** `agentes/roles.py`
-- **Orden/coordinación entre agentes:** `agentes/orquestador.py`
-- **Herramientas de repo/GitHub:** `agentes/github_tools.py`
-- **Agentes nativos (v2):** `.github/agents/*.md`
-- **Documentación:** `README.md`, `ARQUITECTURA.md`, `DIAGRAMA.md`, `V2-NATIVA.md`
+- **Comportamiento de un agente:** `.github/agents/<agente>.md`
+- **Qué etiqueta lanza qué agente:** `.github/workflows/despacho-agentes.yml`
+- **Despliegue de la web:** `.github/workflows/deploy-pages.yml`
+- **La app demo:** `web/`
+- **Documentación:** `README.md`, `ARQUITECTURA.md`, `V2-NATIVA.md`, `DEMO-PAGES.md`
 
 Para entender el diseño antes de tocar nada, lee [`ARQUITECTURA.md`](ARQUITECTURA.md).
