@@ -1,49 +1,172 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de propina · POC agentes</title>
+  <title>FinCalc · mini-suite de calculadoras</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="tarjeta">
+  <main class="app">
     <header class="cabecera">
-      <h1>💸 Calculadora de propina</h1>
-      <p>App de demo estática para la POC de agentes de GitHub</p>
+      <div>
+        <h1>🧮 FinCalc</h1>
+        <p>Mini-suite de calculadoras financieras · demo de la POC de agentes</p>
+      </div>
+      <button id="tema" class="tema" type="button" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">🌙</button>
     </header>
 
-    <form id="formulario" class="formulario" novalidate>
-      <label>
-        Importe de la cuenta (€)
-        <input id="cuenta" type="number" min="0" step="0.01" placeholder="50.00" />
-      </label>
+    <nav class="tabs" role="tablist" aria-label="Calculadoras">
+      <button class="tab activa" role="tab" data-panel="propina" aria-selected="true">💸 Propina</button>
+      <button class="tab" role="tab" data-panel="divisas" aria-selected="false">💱 Divisas</button>
+      <button class="tab" role="tab" data-panel="prestamo" aria-selected="false">🏦 Préstamo</button>
+      <button class="tab" role="tab" data-panel="gastos" aria-selected="false">🧾 Gastos</button>
+      <button class="tab" role="tab" data-panel="ahorro" aria-selected="false">📈 Ahorro</button>
+    </nav>
 
-      <div class="campo">
-        <label for="porcentaje">Propina (%)</label>
-        <div class="propina-rapida" role="group" aria-label="Seleccionar propina rápida">
-          <button type="button" class="boton-propina activo" data-porcentaje="10" aria-pressed="true">10%</button>
-          <button type="button" class="boton-propina" data-porcentaje="15" aria-pressed="false">15%</button>
-          <button type="button" class="boton-propina" data-porcentaje="20" aria-pressed="false">20%</button>
+    <!-- ===================== PROPINA ===================== -->
+    <section id="panel-propina" class="panel" role="tabpanel" aria-label="Calculadora de propina">
+      <form id="formulario" class="formulario" novalidate>
+        <label>
+          Importe de la cuenta (€)
+          <input id="cuenta" type="number" min="0" step="0.01" placeholder="50.00" />
+        </label>
+
+        <div class="campo">
+          <label for="porcentaje">Propina (%)</label>
+          <div class="propina-rapida" role="group" aria-label="Seleccionar propina rápida">
+            <button type="button" class="boton-propina activo" data-porcentaje="10" aria-pressed="true">10%</button>
+            <button type="button" class="boton-propina" data-porcentaje="15" aria-pressed="false">15%</button>
+            <button type="button" class="boton-propina" data-porcentaje="20" aria-pressed="false">20%</button>
+          </div>
+          <input id="porcentaje" type="number" min="0" step="0.01" value="10" />
         </div>
-        <input id="porcentaje" type="number" min="0" step="0.01" value="10" />
-      </div>
 
-      <label>
-        Número de personas
-        <input id="personas" type="number" min="1" step="1" value="2" />
-      </label>
+        <label>
+          Número de personas
+          <input id="personas" type="number" min="1" step="1" value="2" />
+        </label>
 
-      <button type="submit" class="boton-calcular">Calcular</button>
-    </form>
+        <button type="submit" class="boton-calcular">Calcular</button>
+      </form>
 
-    <section id="resultado" class="resultado oculto" aria-live="polite">
-      <div class="fila"><span>Propina</span><strong id="r-propina">—</strong></div>
-      <div class="fila"><span>Total</span><strong id="r-total">—</strong></div>
-      <div class="fila destacada"><span>Por persona</span><strong id="r-persona">—</strong></div>
+      <section id="resultado" class="resultado oculto" aria-live="polite">
+        <div class="fila"><span>Propina</span><strong id="r-propina">—</strong></div>
+        <div class="fila"><span>Total</span><strong id="r-total">—</strong></div>
+        <div class="fila destacada"><span>Por persona</span><strong id="r-persona">—</strong></div>
+      </section>
+      <p id="error" class="error oculto" role="alert"></p>
     </section>
 
-    <p id="error" class="error oculto" role="alert"></p>
+    <!-- ===================== DIVISAS ===================== -->
+    <section id="panel-divisas" class="panel oculto" role="tabpanel" aria-label="Conversor de divisas">
+      <form id="form-divisas" class="formulario" novalidate>
+        <label>
+          Importe
+          <input id="div-importe" type="number" min="0" step="0.01" placeholder="100.00" />
+        </label>
+        <label>
+          De
+          <select id="div-origen">
+            <option value="EUR">EUR · Euro</option>
+            <option value="USD">USD · Dólar</option>
+            <option value="GBP">GBP · Libra</option>
+            <option value="JPY">JPY · Yen</option>
+            <option value="CHF">CHF · Franco suizo</option>
+          </select>
+        </label>
+        <label>
+          A
+          <select id="div-destino">
+            <option value="USD">USD · Dólar</option>
+            <option value="EUR">EUR · Euro</option>
+            <option value="GBP">GBP · Libra</option>
+            <option value="JPY">JPY · Yen</option>
+            <option value="CHF">CHF · Franco suizo</option>
+          </select>
+        </label>
+        <button type="submit" class="boton-calcular">Convertir</button>
+      </form>
+      <section id="div-resultado" class="resultado oculto" aria-live="polite">
+        <div class="fila destacada"><span>Resultado</span><strong id="div-r-total">—</strong></div>
+        <div class="fila"><span>Tasa aplicada</span><strong id="div-r-tasa">—</strong></div>
+      </section>
+      <p id="div-error" class="error oculto" role="alert"></p>
+      <p class="nota">Tasas de ejemplo fijas (no en tiempo real).</p>
+    </section>
+
+    <!-- ===================== PRÉSTAMO ===================== -->
+    <section id="panel-prestamo" class="panel oculto" role="tabpanel" aria-label="Calculadora de préstamo">
+      <form id="form-prestamo" class="formulario" novalidate>
+        <label>
+          Importe del préstamo (€)
+          <input id="pre-importe" type="number" min="0" step="0.01" placeholder="10000" />
+        </label>
+        <label>
+          Interés anual (%)
+          <input id="pre-interes" type="number" min="0" step="0.01" placeholder="5" />
+        </label>
+        <label>
+          Plazo (meses)
+          <input id="pre-meses" type="number" min="1" step="1" placeholder="36" />
+        </label>
+        <button type="submit" class="boton-calcular">Calcular cuota</button>
+      </form>
+      <section id="pre-resultado" class="resultado oculto" aria-live="polite">
+        <div class="fila destacada"><span>Cuota mensual</span><strong id="pre-r-cuota">—</strong></div>
+        <div class="fila"><span>Total a pagar</span><strong id="pre-r-total">—</strong></div>
+        <div class="fila"><span>Intereses</span><strong id="pre-r-intereses">—</strong></div>
+      </section>
+      <p id="pre-error" class="error oculto" role="alert"></p>
+    </section>
+
+    <!-- ===================== DIVIDIR GASTOS ===================== -->
+    <section id="panel-gastos" class="panel oculto" role="tabpanel" aria-label="Dividir gastos">
+      <form id="form-gastos" class="formulario" novalidate>
+        <label>
+          Total del gasto (€)
+          <input id="gas-total" type="number" min="0" step="0.01" placeholder="120" />
+        </label>
+        <label>
+          Número de personas
+          <input id="gas-personas" type="number" min="1" step="1" placeholder="3" />
+        </label>
+        <label>
+          Propina a añadir (%)
+          <input id="gas-propina" type="number" min="0" step="1" value="0" />
+        </label>
+        <button type="submit" class="boton-calcular">Dividir</button>
+      </form>
+      <section id="gas-resultado" class="resultado oculto" aria-live="polite">
+        <div class="fila"><span>Total con propina</span><strong id="gas-r-total">—</strong></div>
+        <div class="fila destacada"><span>Paga cada persona</span><strong id="gas-r-persona">—</strong></div>
+      </section>
+      <p id="gas-error" class="error oculto" role="alert"></p>
+    </section>
+
+    <!-- ===================== AHORRO ===================== -->
+    <section id="panel-ahorro" class="panel oculto" role="tabpanel" aria-label="Ahorro objetivo">
+      <form id="form-ahorro" class="formulario" novalidate>
+        <label>
+          Meta de ahorro (€)
+          <input id="aho-meta" type="number" min="0" step="0.01" placeholder="5000" />
+        </label>
+        <label>
+          Aporte mensual (€)
+          <input id="aho-aporte" type="number" min="0" step="0.01" placeholder="200" />
+        </label>
+        <label>
+          Interés anual (%)
+          <input id="aho-interes" type="number" min="0" step="0.01" value="0" />
+        </label>
+        <button type="submit" class="boton-calcular">Calcular</button>
+      </form>
+      <section id="aho-resultado" class="resultado oculto" aria-live="polite">
+        <div class="fila destacada"><span>Tiempo hasta la meta</span><strong id="aho-r-tiempo">—</strong></div>
+        <div class="fila"><span>Meses</span><strong id="aho-r-meses">—</strong></div>
+      </section>
+      <p id="aho-error" class="error oculto" role="alert"></p>
+    </section>
 
     <footer class="pie">
       <span>Desplegada con GitHub Pages · <a href="https://github.com/vmfernandezg/poc-agentes-github">repo</a></span>
