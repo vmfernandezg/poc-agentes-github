@@ -118,3 +118,14 @@ Esto ejecuta los tests de `web/app.js` con el runner nativo de Node (`node --tes
 
 Más detalle de diseño en [`ARQUITECTURA.md`](ARQUITECTURA.md) · cómo contribuir en
 [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## FAQ
+
+**¿Por qué el PAT debe ser classic y no fine-grained?**  
+Porque la API usada para despachar agentes en esta POC requiere un PAT classic con scope `repo`; ni los fine-grained ni el `GITHUB_TOKEN` estándar funcionan en ese flujo.
+
+**¿Qué hace el workflow de despacho?**  
+`despacho-agentes.yml` escucha etiquetas `auto-*`, mapea cada etiqueta al agente correspondiente y dispara su ejecución para que prepare cambios y abra un PR.
+
+**¿Cómo se cierra el issue "solo"?**  
+Cuando el PR del agente se mergea, GitHub puede cerrar automáticamente el issue si el PR incluye una referencia de cierre (por ejemplo, `Closes #15`) en su descripción o commits.
