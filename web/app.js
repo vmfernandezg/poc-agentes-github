@@ -18,6 +18,15 @@ function mostrarError(mensaje) {
   err.classList.remove("oculto");
 }
 
+function actualizarBotonActivo(valor) {
+  const porcentaje = Number(valor);
+  document.querySelectorAll(".boton-propina").forEach((boton) => {
+    const activo = Number(boton.dataset.porcentaje) === porcentaje;
+    boton.classList.toggle("activo", activo);
+    boton.setAttribute("aria-pressed", String(activo));
+  });
+}
+
 function calcular(evento) {
   evento.preventDefault();
 
@@ -51,4 +60,16 @@ function calcular(evento) {
   $("resultado").classList.remove("oculto");
 }
 
+document.querySelectorAll(".boton-propina").forEach((boton) => {
+  boton.addEventListener("click", () => {
+    $("porcentaje").value = boton.dataset.porcentaje;
+    actualizarBotonActivo(boton.dataset.porcentaje);
+  });
+});
+
+$("porcentaje").addEventListener("input", (evento) => {
+  actualizarBotonActivo(evento.target.value);
+});
+
+actualizarBotonActivo($("porcentaje").value);
 document.getElementById("formulario").addEventListener("submit", calcular);
